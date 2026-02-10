@@ -1,0 +1,7 @@
+tokenizers
+sentencepiece
+pyyaml
+tqdm
+regex
+unicodedata2
+datasets

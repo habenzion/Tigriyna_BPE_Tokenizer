@@ -1,0 +1,14 @@
+tokenizer:
+  type: bpe
+  vocab_size: 52000
+  min_frequency: 5
+
+normalization:
+  unicode: NFC
+  aggressive_split: true
+
+special_tokens:
+  - <unk>
+  - <bos>
+  - <eos>
+  - <pad>

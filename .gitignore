@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Virtual environment
+venv/
+ENV/
+env/
+.env/
+.venv/
+venv
+# IDEs and editors
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+
+# Ignore large processed data
+data/processed/normalized.txt
+data/raw/tlmd/train.txt
+##"data/processed/normalized.txt" 
+"data/raw/tlmd/train.txt" 
+"data/processed/normalized.txt" 
+"data/raw/tlmd/train.txt" 
