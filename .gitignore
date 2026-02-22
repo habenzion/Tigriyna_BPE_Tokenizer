@@ -19,6 +19,8 @@ venv
 .DS_Store
 Thumbs.db
 
+dist/
+build/
 
 # Ignore large processed data
 data/processed/normalized.txt
