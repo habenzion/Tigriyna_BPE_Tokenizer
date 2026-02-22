@@ -3,7 +3,7 @@ from pathlib import Path
 from tokenizers import Tokenizer
 from tokenizers.models import BPE
 from tokenizers.trainers import BpeTrainer
-from tokenizers.pre_tokenizers import Split
+from tokenizers.pre_tokenizers import Whitespace
 from tokenizers.normalizers import Sequence, NFC
 from tokenizers.decoders import BPEDecoder
 import yaml
@@ -32,16 +32,17 @@ def train():
     # Initialize tokenizer
     tokenizer = Tokenizer(BPE(unk_token="<unk>"))
 
-    # Normalize Unicode (important for Ge’ez)
+    # Unicode normalization (critical for Ge’ez script consistency)
     tokenizer.normalizer = Sequence([NFC()])
 
-    # Character-level splitting
-    tokenizer.pre_tokenizer = Split(pattern=r"", behavior="isolated")
+    # ✅ IMPORTANT FIX:
+    # Use whitespace splitting so BPE can learn merges inside words
+    tokenizer.pre_tokenizer = Whitespace()
 
-    # Proper BPE decoder (joins tokens correctly)
+    # Proper BPE decoder
     tokenizer.decoder = BPEDecoder()
 
-    # Trainer
+    # Trainer configuration
     trainer = BpeTrainer(
         vocab_size=cfg["tokenizer"]["vocab_size"],
         min_frequency=cfg["tokenizer"]["min_frequency"],
@@ -55,15 +56,16 @@ def train():
     # Save tokenizer
     out_dir = Path("outputs/tokenizer")
     out_dir.mkdir(parents=True, exist_ok=True)
-    tokenizer.save(str(out_dir / "tokenizer.json"))
+    output_path = out_dir / "tokenizer.json"
+    tokenizer.save(str(output_path))
 
-    print(f"[INFO] Tokenizer saved to: {out_dir / 'tokenizer.json'}")
+    print(f"[INFO] Tokenizer saved to: {output_path}")
 
-    # Sanity check
+    # Quick sanity check
     test_text = "ሰላም ኩን ኣደርካ?"
     encoding = tokenizer.encode(test_text)
 
-    print(f"[INFO] Sample text: {test_text}")
+    print(f"\n[INFO] Sample text: {test_text}")
     print(f"[INFO] Tokens: {encoding.tokens}")
     print(f"[INFO] Decoded: {tokenizer.decode(encoding.ids)}")
 
@@ -71,6 +73,16 @@ def train():
         print("[INFO] Round-trip PASSED ✅")
     else:
         print("[WARNING] Round-trip FAILED ❌")
+
+    # Check if merges were learned
+    model = tokenizer.model
+    if hasattr(model, "get_merges"):
+        merges = model.get_merges()
+        print(f"[INFO] Number of learned merges: {len(merges)}")
+        if len(merges) == 0:
+            print("[WARNING] No merges learned! Increase vocab_size or check corpus.")
+    else:
+        print("[INFO] Cannot directly inspect merges (check tokenizer.json).")
 
 
 if __name__ == "__main__":
