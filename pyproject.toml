@@ -4,14 +4,22 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tigrinya-tokenizer"
-version = "0.1.2"
+version = "0.1.3"
 description = "Robust Tigrinya Byte Pair Encoding tokenizer"
 authors = [
   { name="Haben Eyasu", email="habifishe@gmail.com" }
 ]
 readme = "README.md"
 requires-python = ">=3.8"
-dependencies = []
+
+packages = [{ include = "tigrinya_tokenizer" }]
+include = [
+    "src/tigrinya_tokenizer/configs/*.yaml"
+]
+dependencies = [
+   "tokenizers>=0.13.3",
+    "PyYAML>=6.0"
+]
 
 
 license = "MIT"

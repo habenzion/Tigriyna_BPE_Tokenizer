@@ -17,7 +17,7 @@ class TigrinyaTokenizer:
     Users can just call .tokenize(text) and get tokenized output.
     Automatically trains on default corpus or loads existing tokenizer if available.
     """
-
+    
     def __init__(self, tokenizer_path="outputs/tokenizer/tokenizer.json",
                  corpus_file="data/processed/normalized.txt",
                  config_path="configs/bpe_50k.yaml"):
@@ -39,7 +39,18 @@ class TigrinyaTokenizer:
         # Train automatically if tokenizer not loaded
         if self.tokenizer is None:
             self.train()
-
+            #Load the YAMLL CONFIG  tokenizer
+def load_config(self, path="configs/bpe_50k.yaml"):
+    """
+    Load YAML config from package data
+    """
+    try:
+        # Access file inside the installed package
+        stream = pkg_resources.resource_stream(__name__, path)
+        return yaml.safe_load(stream)
+    except FileNotFoundError:
+        raise FileNotFoundError(f"Config file not found inside package: {path}")
+    
     def load_config(self, path):
         """Load tokenizer config YAML"""
         if not os.path.exists(path):
