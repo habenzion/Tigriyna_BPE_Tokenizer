@@ -1,0 +1,10 @@
+README.md
+pyproject.toml
+src/tigrinya_tokenizer/corpus.py
+src/tigrinya_tokenizer/normalization.py
+src/tigrinya_tokenizer/train_bpe.py
+src/tigrinya_tokenizer.egg-info/PKG-INFO
+src/tigrinya_tokenizer.egg-info/SOURCES.txt
+src/tigrinya_tokenizer.egg-info/dependency_links.txt
+src/tigrinya_tokenizer.egg-info/top_level.txt
+test/test_tokenizer_tigrinya.py
