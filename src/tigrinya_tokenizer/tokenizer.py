@@ -1,57 +1,39 @@
-import yaml
+import os
 from pathlib import Path
-from tokenizers import Tokenizer, models, trainers, pre_tokenizers, normalizers, decoders
-import importlib.resources as pkg_resources
-from . import configs  # the folder inside your package
+from tokenizers import Tokenizer
 
 class TigrinyaTokenizer:
-    def __init__(self, vocab_size=50000):
-        self.vocab_size = vocab_size
-        self.tokenizer_path = Path("outputs/tokenizer/tokenizer.json")
+    """
+    Tigrinya Byte-Pair Encoding (BPE) Tokenizer.
 
-        # Load config from package
-        self.cfg = self.load_config()
+    Usage:
+        from tigrinya_tokenizer import TigrinyaTokenizer
+        tokenizer = TigrinyaTokenizer()
+        tokens = tokenizer.encode("ሰላም ኩን ኣደርካ?")
+        text = tokenizer.decode(tokens)
+    """
+    def __init__(self):
+        # Load pre-trained tokenizer shipped in package
+        pkg_dir = Path(__file__).parent
+        tokenizer_path = pkg_dir / "tokenizer.json"
 
-        # Load or train tokenizer
-        if self.tokenizer_path.exists():
-            self.tokenizer = Tokenizer.from_file(str(self.tokenizer_path))
-        else:
-            print("[INFO] No existing tokenizer found, will train new one.")
-            self.train()
+        if not tokenizer_path.exists():
+            raise FileNotFoundError(
+                f"Pre-trained tokenizer not found at {tokenizer_path}. "
+                "Please ensure tokenizer.json is included in the package."
+            )
 
-    def load_config(self):
-        # Load YAML config from package resources
-        with pkg_resources.open_text(configs, "bpe_50k.yaml") as f:
-            return yaml.safe_load(f)
+        self.tokenizer = Tokenizer.from_file(str(tokenizer_path))
 
-    def train(self):
-        from tokenizers.models import BPE
-        from tokenizers.trainers import BpeTrainer
-        from tokenizers.pre_tokenizers import Whitespace
-        from tokenizers.normalizers import Sequence, NFC
-        from tokenizers.decoders import BPEDecoder
-        import os
-
-        corpus_file = "data/processed/normalized.txt"
-        if not Path(corpus_file).exists():
-            raise FileNotFoundError(f"Corpus file not found: {corpus_file}")
-
-        tokenizer = Tokenizer(BPE(unk_token="<unk>"))
-        tokenizer.normalizer = Sequence([NFC()])
-        tokenizer.pre_tokenizer = Whitespace()
-        tokenizer.decoder = BPEDecoder()
-
-        trainer = BpeTrainer(
-            vocab_size=self.cfg["tokenizer"]["vocab_size"],
-            min_frequency=self.cfg["tokenizer"]["min_frequency"],
-            special_tokens=self.cfg["special_tokens"]
-        )
-
-        tokenizer.train(files=[corpus_file], trainer=trainer)
-
-        self.tokenizer = tokenizer
-        self.tokenizer_path.parent.mkdir(parents=True, exist_ok=True)
-        tokenizer.save(str(self.tokenizer_path))
-
-    def tokenize(self, text: str):
+    def encode(self, text: str):
+        """Return list of tokens from input text."""
         return self.tokenizer.encode(text).tokens
+
+    def decode(self, tokens):
+        """Return text string from list of token IDs or token strings."""
+        if all(isinstance(t, int) for t in tokens):
+            return self.tokenizer.decode(tokens)
+        else:
+            # convert token strings to ids first
+            ids = [self.tokenizer.token_to_id(t) for t in tokens]
+            return self.tokenizer.decode(ids)

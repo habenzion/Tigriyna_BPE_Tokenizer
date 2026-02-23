@@ -1,0 +1,8 @@
+README.md
+pyproject.toml
+test/test_tokenizer_tigrinya.py
+tigrinya_tokenizer.egg-info/PKG-INFO
+tigrinya_tokenizer.egg-info/SOURCES.txt
+tigrinya_tokenizer.egg-info/dependency_links.txt
+tigrinya_tokenizer.egg-info/requires.txt
+tigrinya_tokenizer.egg-info/top_level.txt
