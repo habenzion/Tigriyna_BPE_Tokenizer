@@ -9,11 +9,13 @@ class TigrinyaTokenizer:
     Provides:
         - word_tokenize(text)
         - char_tokenize(text)
+        - subword_tokenize(text)  (BPE-based)
 
+    Users do NOT call encode/decode directly.
     """
 
     def __init__(self):
-        # Load pre-trained BPE tokenizer for word-level tokenization
+        # Load trained BPE tokenizer for subword tokenization
         pkg_dir = Path(__file__).parent
         tokenizer_path = pkg_dir / "tokenizer.json"
 
@@ -25,12 +27,42 @@ class TigrinyaTokenizer:
 
         self._bpe_tokenizer = Tokenizer.from_file(str(tokenizer_path))
 
-    # ---------------------------------------
-    # WORD LEVEL TOKENIZATION (BPE based)
-    # ---------------------------------------
+    # --------------------------------------------------
+    # 1️⃣ Word Tokenization (Whitespace-Based)
+    # --------------------------------------------------
     def word_tokenize(self, text: str):
         """
-        Tokenizes text using the pre-trained BPE tokenizer.
+        Splits text by whitespace.
+
+        Returns:
+            List[str]
+        """
+        if not isinstance(text, str):
+            raise TypeError("Input must be a string.")
+
+        return text.split()
+
+    # --------------------------------------------------
+    # 2️⃣ Character Tokenization
+    # --------------------------------------------------
+    def char_tokenize(self, text: str):
+        """
+        Splits text into individual characters.
+
+        Returns:
+            List[str]
+        """
+        if not isinstance(text, str):
+            raise TypeError("Input must be a string.")
+
+        return list(text)
+
+    # --------------------------------------------------
+    # 3️⃣ Subword Tokenization (BPE-Based)
+    # --------------------------------------------------
+    def subword_tokenize(self, text: str):
+        """
+        Tokenizes text using the trained BPE tokenizer.
 
         Returns:
             List[str] — subword tokens
@@ -40,19 +72,3 @@ class TigrinyaTokenizer:
 
         encoding = self._bpe_tokenizer.encode(text)
         return encoding.tokens
-
-    # ---------------------------------------
-    # CHARACTER LEVEL TOKENIZATION
-    # ---------------------------------------
-    def char_tokenize(self, text: str):
-        """
-        Tokenizes text at character level.
-
-        Returns:
-            List[str] — individual characters
-        """
-        if not isinstance(text, str):
-            raise TypeError("Input must be a string.")
-
-        # Preserve spaces as tokens
-        return list(text)

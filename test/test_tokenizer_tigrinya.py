@@ -1,12 +1,14 @@
-from tigrinya_tokenizer import TigrinyaTokenizer
+from tokenizers import Tokenizer
 
-# Initialize your library
-tokenizer = TigrinyaTokenizer()
+TOKENIZER_PATH = "outputs/tokenizer/tokenizer.json"
+
+# Load tokenizer
+tokenizer = Tokenizer.from_file(TOKENIZER_PATH)
 
 
-# -------------------------------
-# 1️⃣ Word-Level Test Words
-# -------------------------------
+
+# 1️⃣ Random Tigrinya Test Words
+
 
 TEST_WORDS = [
     "ሰላም",
@@ -31,47 +33,47 @@ def test_word(word):
     print("=" * 60)
     print(f"Original: {word}")
 
-    tokens = tokenizer.word_tokenize(word)
-    char_tokens = tokenizer.char_tokenize(word)
+    encoding = tokenizer.encode(word)
+    tokens = encoding.tokens
+    decoded = tokenizer.decode(encoding.ids)
 
-    print(f"Word Tokens : {tokens}")
-    print(f"Char Tokens : {char_tokens}")
+    print(f"Tokens: {tokens}")
+    print(f"Decoded: {decoded}")
 
-    # Basic validation checks
-    if not tokens:
-        print("❌ Word tokenization FAILED (empty output)")
+    # Check unknown tokens
+    if "<unk>" in tokens:
+        print("⚠ WARNING: <unk> token detected")
+
+    # Check round-trip correctness
+    if decoded == word:
+        print("✅ Round-trip OK")
     else:
-        print("✅ Word tokenization OK")
-
-    if not char_tokens:
-        print("❌ Char tokenization FAILED (empty output)")
-    else:
-        print("✅ Char tokenization OK")
+        print("❌ Round-trip FAILED")
 
 
-def run_word_tests():
-    print("\nRunning Word-Level Tokenization Tests\n")
+def run_tests():
+    print("\nRunning Tigrinya Tokenizer Tests\n")
     for word in TEST_WORDS:
         test_word(word)
 
 
-# -------------------------------
+
 # 2️⃣ Sentence-Level Tests
-# -------------------------------
+
 
 SENTENCES = [
-    "ሰላም ኩን ኣደርካ?",
+    "ሰላም ኩን ኣደርካ ዘይተፈጥሮውነት ?",
     "ኣብ ትግርኛ መምህራን ኣሎዉ።",
     "ትምህርቲ ኣገዳሲ ኢዩ፣ ወላ'ውን ጠቃሚ ኢዩ",
 ]
 
 
 def run_sentence_tests():
-    print("\nRunning Sentence-Level Tests\n")
+    print("\nRunning Sentence Tests\n")
     for sentence in SENTENCES:
         test_word(sentence)
 
 
 if __name__ == "__main__":
-    run_word_tests()
+    run_tests()
     run_sentence_tests()
